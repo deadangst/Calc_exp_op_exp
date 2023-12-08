@@ -3,6 +3,9 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using System.IO;
 using System.Windows.Controls;
+using System.Windows.Input;
+using System.ComponentModel;
+using Newtonsoft.Json;
 
 namespace CalculatorApp
 {
@@ -17,6 +20,9 @@ namespace CalculatorApp
             InitializeComponent();
             DataGridCalculadora.ItemsSource = items;
             CargarDatos();
+
+            // Agrega un manejador para el evento KeyDown del TextBox
+            InputBox.KeyDown += InputBox_KeyDown;
         }
 
         private void Ingresar_Click(object sender, RoutedEventArgs e)
@@ -28,23 +34,45 @@ namespace CalculatorApp
                 {
                     if (items.Count > 0 && !string.IsNullOrEmpty(items[^1].Operacion) && string.IsNullOrEmpty(items[^1].Expresion2))
                     {
-                        // Si ya hay una operación, se coloca el número en la segunda columna de expresión
                         items[^1].Expresion2 = ultimoInput;
                     }
                     else
                     {
-                        // Si no hay operación, se coloca el número en la primera columna de expresión
                         items.Add(new CalculadoraItem { Expresion = ultimoInput });
                     }
                     InputBox.Clear();
                 }
                 else
                 {
-                    items.Add(new CalculadoraItem { Comentario = "Error léxico, se esperaba un dígito" });
+                    if (items.Count > 0)
+                    {
+                        var ultimoItem = items[^1];
+                        ultimoItem.Comentario = "Error léxico, se esperaba un dígito";
+                        DataGridCalculadora.Items.Refresh();
+
+                        // Agregar una nueva fila con valores de la fila anterior, excepto el comentario
+                        items.Add(new CalculadoraItem
+                        {
+                            Expresion = ultimoItem.Expresion,
+                            Operacion = ultimoItem.Operacion
+                        });
+                    }
+                    else
+                    {
+                        items.Add(new CalculadoraItem { Comentario = "Error léxico, se esperaba un dígito" });
+                    }
                 }
             }
         }
 
+
+        private void InputBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                Ingresar_Click(sender, e);
+            }
+        }
 
 
         private void BtnOperacion_Click(object sender, RoutedEventArgs e)
@@ -56,33 +84,45 @@ namespace CalculatorApp
             {
                 var ultimoItem = items[^1];
 
-                // Comprobar si el último item tiene una expresión numérica y aún no tiene una operación
                 if (!string.IsNullOrEmpty(ultimoItem.Expresion) && string.IsNullOrEmpty(ultimoItem.Operacion))
                 {
-                    // Si el último item es un número, agregar la operación
                     if (double.TryParse(ultimoItem.Expresion, out _))
                     {
                         ultimoItem.Operacion = operacionActual;
-                        DataGridCalculadora.Items.Refresh(); // Actualizar el DataGrid
+                        DataGridCalculadora.Items.Refresh();
                     }
                     else
                     {
-                        // Si el último item no es un número, mostrar error
-                        items.Add(new CalculadoraItem { Comentario = "Error léxico, se esperaba un valor numérico" });
+                        ultimoItem.Comentario = "Error léxico, se esperaba un valor numérico";
+                        DataGridCalculadora.Items.Refresh();
+
+                        // Agregar una nueva fila con valores de la fila anterior, excepto el comentario
+                        items.Add(new CalculadoraItem
+                        {
+                            Expresion = ultimoItem.Expresion,
+                            Operacion = ultimoItem.Operacion
+                        });
                     }
                 }
                 else
                 {
-                    // Si el último item ya tiene una operación o no es un número, mostrar error
-                    items.Add(new CalculadoraItem { Comentario = "Error léxico, se esperaba un valor numérico" });
+                    ultimoItem.Comentario = "Error léxico, se esperaba un valor numérico";
+                    DataGridCalculadora.Items.Refresh();
+
+                    // Agregar una nueva fila con valores de la fila anterior, excepto el comentario
+                    items.Add(new CalculadoraItem
+                    {
+                        Expresion = ultimoItem.Expresion,
+                        Operacion = ultimoItem.Operacion
+                    });
                 }
             }
             else
             {
-                // Si no hay items, mostrar error
                 items.Add(new CalculadoraItem { Comentario = "Error léxico, se esperaba un valor numérico" });
             }
         }
+
 
 
         private void BtnBorrarOperacion_Click(object sender, RoutedEventArgs e)
@@ -133,65 +173,47 @@ namespace CalculatorApp
             }
         }
 
-
-        private void CargarDatos()
+        protected override void OnClosing(CancelEventArgs e)
         {
-            string archivo = @"C:\Calculadora_Proyecto\Resultados_Calc.txt";
-
-            if (File.Exists(archivo))
-            {
-                using (StreamReader file = new StreamReader(archivo))
-                {
-                    string line;
-                    while ((line = file.ReadLine()) != null)
-                    {
-                        var parts = line.Split('|');
-                        if (parts.Length >= 4)
-                        {
-                            items.Add(new CalculadoraItem
-                            {
-                                Expresion = parts[0],
-                                Operacion = parts[1],
-                                Expresion2 = parts[2],
-                                Comentario = parts[3]
-                            });
-                        }
-                    }
-                }
-            }
+            base.OnClosing(e);
+            GuardarDatos(); // Guarda los datos al cerrar la ventana
         }
 
         private void GuardarDatos()
         {
             string directorio = @"C:\Calculadora_Proyecto";
-            string archivo = Path.Combine(directorio, "Resultados_Calc.txt");
+            string archivo = Path.Combine(directorio, "Resultados_Calc.json");
 
-            // Crear directorio si no existe
             if (!Directory.Exists(directorio))
             {
                 Directory.CreateDirectory(directorio);
             }
 
-            using (StreamWriter file = new StreamWriter(archivo, false))
+            string jsonData = JsonConvert.SerializeObject(items);
+            File.WriteAllText(archivo, jsonData);
+        }
+
+
+        private void CargarDatos()
+        {
+            string archivo = @"C:\Calculadora_Proyecto\Resultados_Calc.json";
+
+            if (File.Exists(archivo))
             {
-                foreach (var item in items)
+                string jsonData = File.ReadAllText(archivo);
+                var loadedItems = JsonConvert.DeserializeObject<ObservableCollection<CalculadoraItem>>(jsonData);
+                foreach (var item in loadedItems)
                 {
-                    file.WriteLine($"{item.Expresion}|{item.Operacion}|{item.Expresion2}|{item.Comentario}");
+                    items.Add(item);
                 }
             }
         }
-
-        // Más lógica según sea necesario
-    }
-
-
-
-
-    public class CalculadoraItem
-    {
-        public string Expresion { get; set; }
-        public string Operacion { get; set; }
-        public string Expresion2 { get; set; }
-        public string Comentario { get; set; }
+        public class CalculadoraItem
+        {
+            public string Expresion { get; set; }
+            public string Operacion { get; set; }
+            public string Expresion2 { get; set; }
+            public string Comentario { get; set; }
+        }
     }
 }

@@ -3,21 +3,30 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Calculadora" Height="500" Width="800">
     <Grid>
-        <TextBox Name="InputBox" VerticalAlignment="Top" Margin="10" Width="300" Height="30"/>
-        <Button Content="Ingresar" VerticalAlignment="Top" Margin="320,10,0,0" Width="100" Height="30" Click="Ingresar_Click"/>
+        <TextBox Name="InputBox" VerticalAlignment="Top" Margin="10" Width="200" Height="30"/>
+        <Button Content="Ingresar" VerticalAlignment="Top" Background="Teal" Margin="320,10,0,0" Width="100" Height="30" Click="Ingresar_Click"/>
 
         <!-- Botones para operaciones -->
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,50">
-            <Button Name="BtnSuma" Content="+" Width="50" Click="BtnOperacion_Click"/>
-            <Button Name="BtnResta" Content="-" Width="50" Click="BtnOperacion_Click"/>
-            <Button Name="BtnMultiplicar" Content="*" Width="50" Click="BtnOperacion_Click"/>
-            <Button Name="BtnDividir" Content="/" Width="50" Click="BtnOperacion_Click"/>
-            <Button Name="BtnBorrarOperacion" Content="Borrar Operación" Width="120" Click="BtnBorrarOperacion_Click"/>
-            <Button Name="BtnBorrarDatos" Content="Borrar Datos" Width="100" Click="BtnBorrarDatos_Click"/>
-            <Button Name="BtnResultado" Content="Resultado" Width="80" Click="BtnResultado_Click"/>
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10,60,0,0">
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <Button Name="BtnSuma" Content="+" Width="50" Background="Teal" Margin="100,0,5,0" Click="BtnOperacion_Click"/>
+                <Button Name="BtnResta" Content="-" Width="50" Background="Teal" Margin="0,0,5,0" Click="BtnOperacion_Click"/>                
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <Button Name="BtnMultiplicar" Content="*" Width="50" Background="Teal" Margin="100,0,5,0" Click="BtnOperacion_Click"/>
+                <Button Name="BtnDividir" Content="/" Width="50" Background="Teal" Click="BtnOperacion_Click"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <Button Name="BtnResultado" Content="Resultado" Width="80" Background="Teal" Margin="110,0,5,0" Click="BtnResultado_Click"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Button Name="BtnBorrarOperacion" Content="Borrar Operación" Width="120" Background="Teal" Margin="28,0,5,0" Click="BtnBorrarOperacion_Click"/>
+                <Button Name="BtnBorrarDatos" Content="Borrar Datos" Width="100" Background="Teal" Margin="0,0,5,0" Click="BtnBorrarDatos_Click"/>                
+            </StackPanel>
+
         </StackPanel>
 
-        <DataGrid Name="DataGridCalculadora" Margin="10,100,10,10" AutoGenerateColumns="False">
+        <DataGrid Name="DataGridCalculadora" Margin="10,200,10,10" AutoGenerateColumns="False">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Expresión" Binding="{Binding Expresion}"/>
                 <DataGridTextColumn Header="Operación" Binding="{Binding Operacion}"/>
