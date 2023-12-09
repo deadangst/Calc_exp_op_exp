@@ -9,12 +9,15 @@ using Newtonsoft.Json;
 
 namespace CalculatorApp
 {
+    // Clase principal que representa la ventana de la calculadora.
     public partial class MainWindow : Window
     {
+        // Colección que almacena los elementos de la calculadora
         private ObservableCollection<CalculadoraItem> items = new ObservableCollection<CalculadoraItem>();
         private string operacionActual = string.Empty;
         private string ultimoInput = string.Empty;
 
+        // Constructor de la ventana principal.
         public MainWindow()
         {
             InitializeComponent();
@@ -25,6 +28,8 @@ namespace CalculatorApp
             InputBox.KeyDown += InputBox_KeyDown;
         }
 
+        // Manejador del evento Click para el botón "Ingresar".
+        // Procesa la entrada del usuario y actualiza la interfaz gráfica según corresponda.
         private void Ingresar_Click(object sender, RoutedEventArgs e)
         {
             ultimoInput = InputBox.Text;
@@ -32,12 +37,26 @@ namespace CalculatorApp
             {
                 if (double.TryParse(ultimoInput, out _))
                 {
-                    if (items.Count > 0 && !string.IsNullOrEmpty(items[^1].Operacion) && string.IsNullOrEmpty(items[^1].Expresion2))
+                    if (items.Count > 0 && !string.IsNullOrEmpty(items[^1].Operacion))
                     {
-                        items[^1].Expresion2 = ultimoInput;
+                        if (string.IsNullOrEmpty(items[^1].Expresion2))
+                        {
+                            // Si ya hay una operación pero Expresion2 está vacío, se coloca el número en Expresion2
+                            items[^1].Expresion2 = ultimoInput;
+                            DataGridCalculadora.Items.Refresh(); // Actualiza el DataGrid para mostrar el cambio
+
+                            // Deshabilitar el botón "Borrar Operación"
+                            BtnBorrarOperacion.IsEnabled = false;
+                        }
+                        else
+                        {
+                            // Si ya hay un número en Expresion2, se crea una nueva fila
+                            items.Add(new CalculadoraItem { Expresion = ultimoInput });
+                        }
                     }
                     else
                     {
+                        // Si no hay operación, se coloca el número en la primera columna de expresión
                         items.Add(new CalculadoraItem { Expresion = ultimoInput });
                     }
                     InputBox.Clear();
@@ -65,7 +84,8 @@ namespace CalculatorApp
             }
         }
 
-
+        // Manejador del evento KeyDown para la caja de texto.
+        // Permite al usuario presionar Enter para ingresar datos.
         private void InputBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
@@ -74,7 +94,8 @@ namespace CalculatorApp
             }
         }
 
-
+        // Manejador del evento Click para los botones de operaciones matemáticas.
+        // Agrega la operación seleccionada a la fila activa en el DataGrid.
         private void BtnOperacion_Click(object sender, RoutedEventArgs e)
         {
             Button btn = sender as Button;
@@ -90,6 +111,9 @@ namespace CalculatorApp
                     {
                         ultimoItem.Operacion = operacionActual;
                         DataGridCalculadora.Items.Refresh();
+
+                        // Habilitar el botón "Borrar Operación"
+                        BtnBorrarOperacion.IsEnabled = true;
                     }
                     else
                     {
@@ -124,24 +148,33 @@ namespace CalculatorApp
         }
 
 
-
+        // Manejador del evento Click para el botón "Borrar Operación".
+        // Permite al usuario borrar la operación matemática seleccionada previamente.
         private void BtnBorrarOperacion_Click(object sender, RoutedEventArgs e)
         {
             if (items.Count > 0)
             {
                 items[^1].Operacion = string.Empty;
+                BtnBorrarOperacion.IsEnabled = false; // Deshabilitar el botón después de borrar la operación
+                DataGridCalculadora.Items.Refresh();
             }
         }
 
+        // Manejador del evento Click para el botón "Borrar Datos".
+        // Limpia todos los datos del DataGrid y reinicia la interfaz de la calculadora.
         private void BtnBorrarDatos_Click(object sender, RoutedEventArgs e)
         {
             if (items.Count > 0)
             {
-                items[^1].Expresion = string.Empty;
-                items[^1].Expresion2 = string.Empty;
+                //items[^1].Expresion = string.Empty;
+                //items[^1].Expresion2 = string.Empty;
+                items.Clear(); // Limpia toda la colección
+                DataGridCalculadora.Items.Refresh();
             }
         }
 
+        // Manejador del evento Click para el botón "Resultado".
+        // Calcula el resultado de la operación actual y lo muestra en la interfaz.
         private void BtnResultado_Click(object sender, RoutedEventArgs e)
         {
             if (items.Count > 0)
@@ -173,12 +206,14 @@ namespace CalculatorApp
             }
         }
 
+        // Evento que se activa al cerrar la ventana. Guarda los datos actuales en un archivo JSON.
         protected override void OnClosing(CancelEventArgs e)
         {
             base.OnClosing(e);
             GuardarDatos(); // Guarda los datos al cerrar la ventana
         }
 
+        // Guarda los datos de la calculadora en un archivo JSON.
         private void GuardarDatos()
         {
             string directorio = @"C:\Calculadora_Proyecto";
@@ -193,7 +228,7 @@ namespace CalculatorApp
             File.WriteAllText(archivo, jsonData);
         }
 
-
+        // Carga los datos de la calculadora desde un archivo JSON.
         private void CargarDatos()
         {
             string archivo = @"C:\Calculadora_Proyecto\Resultados_Calc.json";
@@ -208,6 +243,8 @@ namespace CalculatorApp
                 }
             }
         }
+
+        // Clase que representa un elemento de la calculadora
         public class CalculadoraItem
         {
             public string Expresion { get; set; }

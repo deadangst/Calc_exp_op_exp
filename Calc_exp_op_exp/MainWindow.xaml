@@ -1,32 +1,138 @@
 ﻿<Window x:Class="CalculatorApp.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Calculadora" Height="500" Width="800">
-    <Grid>
+        Title="Calculadora" Height="500" Width="800"
+        WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#462AD8"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <!-- Ajustar el Border para que se adapte al tamaño del contenido -->
+                        <Border CornerRadius="20"
+                            Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          Margin="5"/>
+                            <!-- Reducir el Margin para dar más espacio al texto -->
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#28AEED"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Border 
+            BorderThickness="3"
+            Opacity="0.95">
+
+        <Border.BorderBrush>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#462AD9" Offset="0"/>
+                <GradientStop Color="#DA34AE" Offset="0.75"/>
+                <GradientStop Color="#8A16C1" Offset="1"/>
+            </LinearGradientBrush>
+        </Border.BorderBrush>
+
+        <Border.Background>
+            <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
+                <GradientStop Color="#462AD8" Offset="0"/>
+                <GradientStop Color="#1B1448" Offset="1"/>
+            </LinearGradientBrush>
+        </Border.Background>
+        <Grid>
         <TextBox Name="InputBox" VerticalAlignment="Top" Margin="10" Width="200" Height="30"/>
-        <Button Content="Ingresar" VerticalAlignment="Top" Background="Teal" Margin="320,10,0,0" Width="100" Height="30" Click="Ingresar_Click"/>
+            <Button Content="Ingresar" 
+                    VerticalAlignment="Top"                     
+                    Foreground="White" 
+                    FontSize="12"
+                    FontFamily="Montserrat"
+                    Margin="320,10,0,0" 
+                    Width="100" 
+                    Height="30" 
+                    Click="Ingresar_Click"/>
 
         <!-- Botones para operaciones -->
         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10,60,0,0">
             <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                <Button Name="BtnSuma" Content="+" Width="50" Background="Teal" Margin="100,0,5,0" Click="BtnOperacion_Click"/>
-                <Button Name="BtnResta" Content="-" Width="50" Background="Teal" Margin="0,0,5,0" Click="BtnOperacion_Click"/>                
+                <Button Name="BtnSuma" 
+                        Content="+" 
+                        Width="50" 
+                        
+                        Foreground="White" 
+                        FontSize="12"
+                        FontFamily="Montserrat"
+                        Margin="100,0,5,0" 
+                        Click="BtnOperacion_Click"/>
+                <Button Name="BtnResta" 
+                        Content="-" 
+                        Width="50" 
+                        
+                        Foreground="White" 
+                        FontSize="12"
+                        FontFamily="Montserrat"
+                        Margin="0,0,5,0" 
+                        Click="BtnOperacion_Click"/>                
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                <Button Name="BtnMultiplicar" Content="*" Width="50" Background="Teal" Margin="100,0,5,0" Click="BtnOperacion_Click"/>
-                <Button Name="BtnDividir" Content="/" Width="50" Background="Teal" Click="BtnOperacion_Click"/>
+                <Button Name="BtnMultiplicar" 
+                        Content="*" 
+                        Width="50" 
+                        
+                        Foreground="White" 
+                        FontSize="12"
+                        FontFamily="Montserrat"                        
+                        Margin="100,0,5,0" 
+                        Click="BtnOperacion_Click"/>
+                <Button Name="BtnDividir" 
+                        Content="/" 
+                        Width="50" 
+                        
+                        Foreground="White" 
+                        FontSize="12"
+                        FontFamily="Montserrat"                        
+                        Click="BtnOperacion_Click"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                <Button Name="BtnResultado" Content="Resultado" Width="80" Background="Teal" Margin="110,0,5,0" Click="BtnResultado_Click"/>
+                <Button Name="BtnResultado" 
+                        Content="Resultado" 
+                        Width="80" 
+                        
+                        Foreground="White" 
+                        FontSize="12"
+                        FontFamily="Montserrat"                        
+                        Margin="110,0,5,0" 
+                        Click="BtnResultado_Click"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
-                <Button Name="BtnBorrarOperacion" Content="Borrar Operación" Width="120" Background="Teal" Margin="28,0,5,0" Click="BtnBorrarOperacion_Click"/>
-                <Button Name="BtnBorrarDatos" Content="Borrar Datos" Width="100" Background="Teal" Margin="0,0,5,0" Click="BtnBorrarDatos_Click"/>                
+                <Button Name="BtnBorrarOperacion" 
+                        Content="Borrar Operación" 
+                        Width="120" 
+                        Foreground="White" 
+                        FontSize="12"
+                        FontFamily="Montserrat"                        
+                        Margin="28,0,5,0" 
+                        Click="BtnBorrarOperacion_Click"/>
+                <Button Name="BtnBorrarDatos" 
+                        Content="Borrar Datos" 
+                        Width="100" 
+                        
+                        Foreground="White" 
+                        FontSize="12"
+                        FontFamily="Montserrat"                        
+                        Margin="0,0,5,0" 
+                        Click="BtnBorrarDatos_Click"/>                
             </StackPanel>
 
         </StackPanel>
 
-        <DataGrid Name="DataGridCalculadora" Margin="10,200,10,10" AutoGenerateColumns="False">
+        <DataGrid Name="DataGridCalculadora" Margin="10,205,10,10" AutoGenerateColumns="False">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Expresión" Binding="{Binding Expresion}"/>
                 <DataGridTextColumn Header="Operación" Binding="{Binding Operacion}"/>
@@ -35,4 +141,5 @@
             </DataGrid.Columns>
         </DataGrid>
     </Grid>
+    </Border>
 </Window>
